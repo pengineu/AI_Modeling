@@ -1,0 +1,17 @@
+# Dataset & artifacts (not committed; synced via gdrive)
+data/
+*.zip
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.npy
+release/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# IDE
+.idea/

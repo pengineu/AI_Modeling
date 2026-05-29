@@ -1,0 +1,11 @@
+Task 3 — Image Retrieval (Embedding Similarity Search) model
+임베딩: CLIP openai/clip-vit-base-patch32 (공개 가중치, HuggingFace transformers 자동 다운로드 — 별도 업로드 불필요)
+라벨링: Task1 분류기(task1.pt) 재사용
+
+Google Drive 공유 링크 (링크 있는 사용자 공개):
+task1.pt : <Task1 과 동일 링크>
+
+파일 ID (노트북 MODEL_FILE_ID 에 입력):
+<task1.pt 파일 ID>
+
+비고: 검색 자체는 학습 모델 불필요(공개 CLIP). 라벨 출력용으로만 Task1 모델 사용.
