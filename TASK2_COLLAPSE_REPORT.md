@@ -53,3 +53,28 @@ iter 16600  D 0.040  G_adv 33.680  G_cls 14.942  G_rec 0.551
 
 ## 7. 교훈
 - GAN은 **손실값이 진척도 지표가 아님** — 붕괴는 손실보다 샘플 이미지에서 먼저 명확히 드러남. 재학습 시에도 초반 샘플(iter 2k·4k…)을 일찍·자주 점검할 것.
+
+---
+
+## 8. 적용된 수정 (코드 담당 PC, 2026-05-30) — ✅ 재학습 준비 완료
+보고서 제안대로 **구조 변경 없이** 학습 루프/모델 D만 수정. Generator의 state_dict 키는 그대로(검증: EMA 체크포인트가 노트북용 plain Generator에 `strict=True`로 로드됨, 103 keys, SN 아티팩트 0).
+
+1. **판별자 spectral normalization** (`src/task2/models.py`): `Discriminator`의 모든 conv를 `spectral_norm`으로 래핑 (`use_spectral_norm=True` 기본). D에 Lipschitz 제약 → D 압승/붕괴 방지. **핵심 처방.** double-backward 불필요(R1/WGAN-GP 회피 → 환경 무관 안정). D는 학습 후 폐기되므로 제출(G)과 무관.
+2. **D:G 균형** (`train.py`): `--n-critic` 기본 **5→1**.
+3. **Generator EMA** (`train.py`): `--ema-decay 0.999`. 샘플·저장 가중치 모두 **EMA G** 사용 → 안정·품질↑. (구조 동일, 노트북 호환)
+4. **Grad clip** (`train.py`): `--grad-clip 5.0` (G·D) → adv 폭발 스파이크 완화. 0이면 비활성.
+5. **체크포인트 비덮어쓰기** (`train.py`): 매 `save-every`마다 `checkpoints/stargan_G.pt`(최신) + `checkpoints/stargan_G_<iter>.pt`(태그 스냅샷) 동시 저장 → 후속 붕괴해도 좋은 가중치 보존. (디스크 여유 확인; 불필요한 옛 스냅샷은 수동 삭제 가능)
+6. `--sample-every` 기본 2000→**1000** (조기·빈번 점검).
+
+### RTX 머신 재학습 절차
+```bash
+git pull
+# 1) smoke: 초반 샘플 즉시 점검 (붕괴 조짐 조기 감지)
+python -m src.task2.train --data data/train --iters 4000 --batch 16 --img-size 128 --sample-every 500
+#    samples_task2/iter_000500.png ~ iter_004000.png 에서 콘텐츠 보존+스타일 변환 확인
+# 2) 본 학습
+python -m src.task2.train --data data/train --iters 200000 --batch 16 --img-size 128
+#    OOM 시 --batch 8. iter 14k 부근 안정성 특히 주시.
+```
+- 정상 신호: `D`가 0으로 고착되지 **않고** 0.1~수준 유지, `G_adv` 폭발 없음, 샘플 콘텐츠 유지.
+- 최종 제출용 G는 샘플 품질이 가장 좋은 iter의 `stargan_G_<iter>.pt`를 선택(또는 최신 `stargan_G.pt`).

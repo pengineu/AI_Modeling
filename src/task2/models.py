@@ -9,8 +9,14 @@ Reference: Choi et al., "StarGAN" (CVPR 2018).
 
 import torch
 import torch.nn as nn
+from torch.nn.utils import spectral_norm
 
 from src.common.labels import NUM_STYLE
+
+
+def _sn(module: nn.Module, use: bool = True) -> nn.Module:
+    """Wrap a layer in spectral normalization (Lipschitz constraint) when enabled."""
+    return spectral_norm(module) if use else module
 
 
 class ResidualBlock(nn.Module):
@@ -71,19 +77,27 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    """PatchGAN: outputs (src_score, style_logits)."""
+    """PatchGAN: outputs (src_score, style_logits).
 
-    def __init__(self, image_size=128, conv_dim=64, c_dim=NUM_STYLE, n_layers=6):
+    Spectral normalization on every conv enforces a Lipschitz constraint on D,
+    preventing the discriminator from overpowering G (the cause of the iter-14k
+    mode collapse). D is discarded after training, so this does not affect the
+    Generator checkpoint / submission notebook compatibility.
+    """
+
+    def __init__(self, image_size=128, conv_dim=64, c_dim=NUM_STYLE, n_layers=6,
+                 use_spectral_norm=True):
         super().__init__()
-        layers = [nn.Conv2d(3, conv_dim, 4, 2, 1), nn.LeakyReLU(0.01)]
+        sn = lambda m: _sn(m, use_spectral_norm)
+        layers = [sn(nn.Conv2d(3, conv_dim, 4, 2, 1)), nn.LeakyReLU(0.01)]
         cur = conv_dim
         for _ in range(1, n_layers):
-            layers += [nn.Conv2d(cur, cur * 2, 4, 2, 1), nn.LeakyReLU(0.01)]
+            layers += [sn(nn.Conv2d(cur, cur * 2, 4, 2, 1)), nn.LeakyReLU(0.01)]
             cur *= 2
         self.main = nn.Sequential(*layers)
         ksize = image_size // (2 ** n_layers)
-        self.src = nn.Conv2d(cur, 1, 3, 1, 1, bias=False)        # patch real/fake
-        self.cls = nn.Conv2d(cur, c_dim, ksize, bias=False)      # style logits
+        self.src = sn(nn.Conv2d(cur, 1, 3, 1, 1, bias=False))    # patch real/fake
+        self.cls = sn(nn.Conv2d(cur, c_dim, ksize, bias=False))  # style logits
 
     def forward(self, x):
         h = self.main(x)
