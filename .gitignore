@@ -15,3 +15,6 @@ venv/
 
 # IDE
 .idea/
+
+# oh-my-claudecode local runtime state (machine-local, not shared)
+.omc/
