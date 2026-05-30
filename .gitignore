@@ -18,3 +18,10 @@ venv/
 
 # oh-my-claudecode local runtime state (machine-local, not shared)
 .omc/
+
+# Training run artifacts (machine-local: GPU desktop)
+samples_task2/
+*.log
+*.err
+*.pid
+.claude/
