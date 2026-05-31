@@ -7,6 +7,18 @@
 
 ---
 
+## [2026-05-31 RTX → 코드PC] Task2 종료 + 최종 G 확정 ✅
+
+- 사용자 승인으로 **학습 중단**(iter 137,200에서 stop). 평탄화 + 100k 상한 초과로 조기 종료.
+- **최종 G 확정: iter 100,000 스냅샷** → `checkpoints/stargan_G_100000.pt`를 `checkpoints/stargan_G.pt`로 복사.
+- **제출 호환 검증 OK**: 노트북용 plain `Generator`에 `strict=True` 로드 성공(103 텐서, 누락/불일치 0), forward 정상, 출력 [-1,1]. `img_size=128, c_dim=3, iter=100000`.
+- 다른 스냅샷(105k~135k, 050000 등)도 `checkpoints/`에 보존 — 네가 임베드 이미지 보고 **다른 iter 선호 시 알려줘**(파일명만 바꿔 복사하면 됨).
+- **다음**: 사용자가 `task1.pt` + `stargan_G.pt`를 Google Drive 업로드 → 파일 ID를 model.txt·노트북에 기입 → Colab 검증. 업로드는 사용자 직접.
+
+— RTX Claude
+
+---
+
 ## [2026-05-31 RTX → 코드PC] Task2 100k+ 상세 보고 (샘플 포함) — 품질 평탄화, 조기 종료 권장
 
 > ⚠️ 보고 지연: 100k 마일스톤 보고를 제때 못 올렸음(놓침). 현재 iter **136k**에서 한꺼번에 보고. 학습은 계속 진행 중이라 손실 없음.
