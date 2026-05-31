@@ -1,12 +1,12 @@
 Task 2 — Image Generation (Style Transfer) model
-모델: StarGAN generator (단일 G, 3 style 다중 도메인, 128x128, hinge loss)
-파일: stargan_G.pt
+모델: StarGAN generator (단일 G, 3 style 다중 도메인, 128x128, hinge loss + spectral_norm D + EMA)
+파일: stargan_G.pt   (iter 130000)
 원본 스타일 판별: Task1 분류기(task1.pt) 재사용
 
-Google Drive 공유 링크 (링크 있는 사용자 공개):
-stargan_G.pt : <여기에 공유 링크>
-task1.pt     : <Task1 과 동일 링크>
+Google Drive 공유 링크 (링크가 있는 모든 사용자 공개):
+stargan_G.pt : https://drive.google.com/file/d/1JwGHAERJjLWBR5JA2JbC_TmYkd0NqaSd/view?usp=drive_link
+task1.pt     : https://drive.google.com/file/d/12bq6yp7NkHreXwQZz6zH73bNrwu5zZSG/view?usp=drive_link
 
-파일 ID (노트북에 입력):
-STARGAN_FILE_ID : <stargan_G.pt 파일 ID>
-TASK1_FILE_ID   : <task1.pt 파일 ID>
+파일 ID (노트북):
+STARGAN_FILE_ID : 1JwGHAERJjLWBR5JA2JbC_TmYkd0NqaSd
+TASK1_FILE_ID   : 12bq6yp7NkHreXwQZz6zH73bNrwu5zZSG
