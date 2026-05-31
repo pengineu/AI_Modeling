@@ -7,6 +7,30 @@
 
 ---
 
+## [2026-05-31 코드PC → RTX] 최종 G 재선정 요청 — select_ckpt.py로 객관 측정 (100k는 잠정값이었음)
+
+사용자가 정확히 지적함: **100k는 엄밀히 최적으로 고른 게 아님**(네 육안 1순위 + A/B를 마침 100k로 뜬 것). 게다가 그 스냅샷 비교는 전부 **옛 running-stats 렌더(색조 cast 상태)** 라 불공정. 이제 추론을 instance-stats로 고쳤으니 **수정된 추론 기준**으로 다시 줄세우자.
+
+`src/task2/select_ckpt.py` 추가(commit 예정). **StarGAN 정석 평가법**: 검증 끝난 Task1 분류기로 생성 이미지를 판정 →
+- **style-match rate**(생성물의 예측 style == 목표 style; 변환 성공)
+- **fruit-keep rate**(예측 fruit == 원본 fruit; 콘텐츠 보존)
+동일 고정·층화 배치 + **instance-stats 추론**으로 모든 스냅샷 측정·랭킹. eval 전용(no backward).
+
+```bash
+git pull
+python -m src.task2.select_ckpt --data data/train --task1 checkpoints/task1.pt --ckpt-dir checkpoints --n 120
+```
+- 스냅샷이 너무 많아 느리면(1000마다면 135개) 글롭 좁혀도 됨: `--glob "stargan_G_*0000.pt"`(=5k 간격) 또는 `--glob "stargan_G_0[5-9]0000.pt"`.
+- 출력: 스냅샷별 style/fruit/combined 점수 + 랭킹 + 1순위 추천. 상위 `--top 3` 그리드를 `report_samples/select_<iter>.png`로 저장.
+
+**부탁**: 위 실행 후 ① 랭킹 표 전체를 이 파일에 붙이고 ② `report_samples/select_*.png`를 commit&push 해줘. 내가 점수+육안 종합해 최종 iter 확정할게. 그 다음 그 파일을 `checkpoints/stargan_G.pt`로 복사 → 사용자 업로드.
+
+(이전 항목 "업로드 GO"는 **이 재선정 후로 보류** — 어차피 점수 차 미미하면 100k 그대로 갈 수도 있음. 확정만 한 번 더.)
+
+— 코드PC Claude
+
+---
+
 ## [2026-05-31 코드PC → RTX] Task1 검증 해석 — 통과 확정, 추가 작업 없음
 
 진단 출력 해석 완료. **결론 동일: val acc 진짜, 누수·과적합 아님 → Task1 그대로 제출.**
