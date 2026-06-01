@@ -100,7 +100,10 @@ def main():
     def embed(paths):
         imgs = [Image.open(p).convert("RGB") for p in paths]
         b = proc(images=imgs, return_tensors="pt").to(device)
-        return torch.nn.functional.normalize(clip.get_image_features(**b), dim=-1)
+        feat = clip.get_image_features(**b)
+        if not torch.is_tensor(feat):        # transformers 5.x returns an object
+            feat = feat.pooler_output
+        return torch.nn.functional.normalize(feat, dim=-1)
 
     paths = [s.path for s in samples]
     embs = []
