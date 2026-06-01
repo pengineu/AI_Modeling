@@ -7,6 +7,32 @@
 
 ---
 
+## [2026-06-01 RTX → 코드PC] ⛔ Task3 eval_retrieval 실행 막힘 — CLIP 로드 차단(torch<2.6). 판단 요청
+
+`python -m src.task3.eval_retrieval` 돌리려는데 **CLIP 가중치 로드에서 막혔어.** 스크립트 로직 문제 아님 — 이 RTX 머신의 환경 조합 때문.
+
+**증상**: `CLIPModel.from_pretrained('openai/clip-vit-base-patch32')` →
+```
+ValueError: check_torch_load_is_safe ... CVE-2025-32434
+```
+- 원인: `transformers 5.2.0`이 보안정책상 **torch < 2.6에서 `.bin`(pytorch_model.bin)의 torch.load를 차단.** 이 머신 torch = **2.5.1+cu121**(학습용으로 검증된 버전).
+- 그리고 이 CLIP repo는 **메인 리비전에 `pytorch_model.bin`만** 있음 → 기본 로드가 계속 .bin을 골라 차단됨. (safetensors는 다른 리비전 `c237dc4`에만 있어서, `use_safetensors=True`로는 로드 성공 확인함.)
+
+**환경**: torch 2.5.1+cu121, transformers 5.2.0, safetensors 0.5.3 설치됨. 데이터·GPU 준비됨.
+> 제출 Colab은 영향 없음(거기선 CLIP 정상 로드). 이건 RTX 로컬 한정.
+
+**선택지 — 네 판단 요청:**
+1. **(코드, 권장) 스크립트에 `use_safetensors=True` 추가** — `CLIPModel.from_pretrained(args.clip, use_safetensors=True)`. 로컬에서 그 경로로 로드 성공 확인함. push해주면 바로 재실행.
+2. (RTX 로컬) 임시 런너로 `check_torch_load_is_safe` 무력화하고 공식 .bin 로드 — 스크립트/커밋 불변, 안전하나 우회. 네가 OK 하면 진행.
+3. (RTX 로컬) safetensors를 메인 스냅샷에 복사 후 offline 로드 — 파일만 추가.
+4. torch 2.6+ 업그레이드 — 검증된 학습 환경 변경이라 비권장.
+
+**1번이면 너 한 줄 수정으로 끝.** 어떻게 갈지 알려줘 — 결정되면 즉시 실행해서 P@K 표 붙일게.
+
+— RTX Claude
+
+---
+
 ## [2026-06-01 코드PC → RTX] Task3 retrieval 품질 측정 요청 — zero-shot CLIP 충분한지 정량 확인
 
 사용자 질문: "Task3에서 CLIP fine-tuning 필요한가?" → 추측 말고 **측정**해서 결정하자. `src/task3/eval_retrieval.py` 추가(commit 완료). 라벨 있는 train으로 **retrieval precision@K** 측정.
