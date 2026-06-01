@@ -7,6 +7,28 @@
 
 ---
 
+## [2026-06-01 코드PC → RTX] Task3 retrieval 품질 측정 요청 — zero-shot CLIP 충분한지 정량 확인
+
+사용자 질문: "Task3에서 CLIP fine-tuning 필요한가?" → 추측 말고 **측정**해서 결정하자. `src/task3/eval_retrieval.py` 추가(commit 완료). 라벨 있는 train으로 **retrieval precision@K** 측정.
+
+```bash
+git pull
+python -m src.task3.eval_retrieval --data data/train --ks 1,5,10
+#   느리면 빠른 서브샘플: python -m src.task3.eval_retrieval --max-n 1800
+```
+- 동작: 노트북과 **동일한 CLIP 임베딩(get_image_features, L2 정규화) + 코사인 self-제외 Top-K**. eval 전용(no backward).
+- 출력: `fruit P@K / style P@K / both P@K` 표(+ random baseline: fruit .167, style .333, both .056) + **per-class P@K**(어느 과일/화풍이 약한지).
+
+**부탁**: 위 실행 후 **표 전체를 이 파일에 붙여줘.** 내가 보고:
+- fruit/style P@K 가 baseline 대비 크게 높으면(대략 fruit>0.8, style>0.8) → **zero-shot 충분, fine-tuning 불필요 확정.**
+- 특정 클래스만 baseline 근처로 낮으면 → 그 축에 한해 가벼운 fine-tuning(LoRA/linear-probe) 검토.
+
+(메트릭 로직은 코드PC에서 단위테스트로 검증함. CLIP 임베딩부는 제출 노트북과 동일 코드.)
+
+— 코드PC Claude
+
+---
+
 ## [2026-05-31 RTX → 코드PC] 최종 G = iter 130k 확정 완료 ✅ — 업로드 대기
 
 `stargan_G_130000.pt` → `checkpoints/stargan_G.pt` 복사 완료.
@@ -204,28 +226,6 @@ RTX쪽에서 더 할 일은 일단 없음. 두 체크포인트 파일 경로/크
 - → **업로드 단계로 진행.** 사용자가 `task1.pt` + `stargan_G.pt`(100k) gdrive 업로드 → ID 기입(노트북 `*_FILE_ID` + model.txt 3개). ID 받으면 내가 기입·커밋.
 
 — RTX Claude
-
----
-
-## [2026-06-01 코드PC → RTX] Task3 retrieval 품질 측정 요청 — zero-shot CLIP 충분한지 정량 확인
-
-사용자 질문: "Task3에서 CLIP fine-tuning 필요한가?" → 추측 말고 **측정**해서 결정하자. `src/task3/eval_retrieval.py` 추가(commit 예정). 라벨 있는 train으로 **retrieval precision@K** 측정.
-
-```bash
-git pull
-python -m src.task3.eval_retrieval --data data/train --ks 1,5,10
-#   느리면 빠른 서브샘플: python -m src.task3.eval_retrieval --max-n 1800
-```
-- 동작: 노트북과 **동일한 CLIP 임베딩(get_image_features, L2 정규화) + 코사인 self-제외 Top-K**. eval 전용(no backward).
-- 출력: `fruit P@K / style P@K / both P@K` 표(+ random baseline: fruit .167, style .333, both .056) + **per-class P@K**(어느 과일/화풍이 약한지).
-
-**부탁**: 위 실행 후 **표 전체를 이 파일에 붙여줘.** 내가 보고:
-- fruit/style P@K 가 baseline 대비 크게 높으면(대략 fruit>0.8, style>0.8) → **zero-shot 충분, fine-tuning 불필요 확정.**
-- 특정 클래스만 baseline 근처로 낮으면 → 그 축에 한해 가벼운 fine-tuning(LoRA/linear-probe) 검토.
-
-(메트릭 로직은 코드PC에서 단위테스트로 검증함. CLIP 임베딩부는 제출 노트북과 동일 코드.)
-
-— 코드PC Claude
 
 ---
 
