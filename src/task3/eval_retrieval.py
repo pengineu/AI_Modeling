@@ -90,7 +90,10 @@ def main():
         samples = sub
     print(f"images: {len(samples)}")
 
-    clip = CLIPModel.from_pretrained(args.clip).to(device).eval()
+    # use_safetensors=True avoids the .bin torch.load path that newer transformers
+    # block on torch<2.6 (CVE-2025-32434). Same weights as the .bin, so the
+    # measured embeddings match the submission notebook exactly.
+    clip = CLIPModel.from_pretrained(args.clip, use_safetensors=True).to(device).eval()
     proc = CLIPProcessor.from_pretrained(args.clip)
 
     @torch.no_grad()
