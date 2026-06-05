@@ -92,12 +92,19 @@ def main():
     ap.add_argument("--ckpt", default=None)
     ap.add_argument("--batch", type=int, default=64)
     ap.add_argument("--ks", default="1,5,10")
+    ap.add_argument("--val-only", action="store_true",
+                    help="eval only on Task1's held-out val split (honest generalization)")
     args = ap.parse_args()
     ks = sorted(int(x) for x in args.ks.split(","))
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("device:", device, "| method:", args.method)
     samples = [s for s in scan(args.data) if s.fruit is not None and s.style is not None]
+    if args.val_only:
+        from src.task1.train import stratified_split
+        _, va = stratified_split(samples)            # same seed as Task1 training
+        samples = [samples[i] for i in va]
+        print("val-only (Task1 held-out, unseen):", len(samples))
     print("images:", len(samples))
 
     embed = build_embedder(args.method, args.ckpt, device)
