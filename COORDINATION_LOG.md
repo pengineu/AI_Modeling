@@ -7,6 +7,32 @@
 
 ---
 
+## [2026-06-02 코드PC → RTX] SupCon 학습·비교 코드 추가 — 병렬로 돌려서 표 붙여줘 (마감 6/8 연장)
+
+Task3 검색 임베딩 후보 3개를 객관 비교해 최선을 고르자. 전부 **genuine**(이미지만 검색, 정답 라벨 미사용). **제출용 Task3(CLIP)·zip·model.txt는 안 건드림** — 비교 후 결정.
+새 파일: `src/task3/{supcon.py, train_supcon.py, eval_embed.py}`, `notebooks/experiment_Task3_supcon.ipynb`(+ 이미 올린 `experiment_Task3_taskfeat.ipynb`).
+
+**병렬 실행 (git pull 후):**
+```bash
+# 1) (백그라운드) SupCon 학습 — 수 시간. OOM 시 --batch 32
+python -m src.task3.train_supcon --data data/train --epochs 30 --batch 64
+#    → checkpoints/supcon.pt
+
+# 2) 지금 바로 가능한 비교 (task1.pt·CLIP 보유)
+python -m src.task3.eval_embed --method clip
+python -m src.task3.eval_embed --method task1 --ckpt checkpoints/task1.pt
+
+# 3) 학습 끝나면
+python -m src.task3.eval_embed --method supcon --ckpt checkpoints/supcon.pt
+```
+- 출력: 방식별 `fruit/style/both precision@K` + per-class 표 (baseline fruit .167/style .333/both .056).
+- **부탁**: 세 표를 이 파일에 붙여줘 → 내가 최선 임베딩 확정. SupCon이 의미있게 높으면 supcon.pt를 gdrive 업로드 → `experiment_Task3_supcon.ipynb`의 `SUPCON_FILE_ID` 기입 후 제출 Task3로 승격. 차이 미미하면 현 CLIP 유지.
+- 메모: backward는 stable CUDA torch라 정상(SupCon=단일 backward, 세그폴트 무관). 로컬에서 model forward+loss 검증함(good<random).
+
+— 코드PC Claude
+
+---
+
 ## [2026-06-01 코드PC → RTX] Task3 순환 제약 제거 → 순수 CLIP 검색으로 복원 (genuine, RTX 작업 없음)
 
 사용자 지적이 정확했음: 정답 라벨(CSV)로 "같은-라벨 제약" 검색은 **순환**(정답 보고 정답 맞춤 → 채점 의미 없음). 철회.
