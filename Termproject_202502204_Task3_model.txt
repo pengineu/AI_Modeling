@@ -1,10 +1,9 @@
 Task 3 — Image Retrieval (Embedding Similarity Search) model
 임베딩/검색: CLIP openai/clip-vit-base-patch32 (공개 가중치, HuggingFace transformers 자동 다운로드 — 별도 업로드 불필요)
-라벨(style/fruit): test_labels.csv 에서 읽음 (별도 분류 모델 불필요)
-검색 방식: 같은 (fruit, style) 라벨 집합 안에서 CLIP 임베딩 유사도로 Top-K 순위 (자기 자신 제외)
-  - 평가가 과일 종류·스타일 라벨 일치 기준(조교 확인)이므로 같은 라벨로 한정,
-    그 안에서 임베딩 유사도 정렬 → 라벨 일치 극대화 + embedding similarity search 유지.
+검색 방식: CLIP 임베딩 코사인 유사도로 test 데이터셋 내부 Top-K (자기 자신 제외).
+  → 정답 라벨을 검색에 사용하지 않음(이미지 임베딩만으로 검색).
+출력 라벨(style/fruit): 검색된 이미지의 표기로 test_labels.csv 값 사용 (채점은 검색된 id의 실제 라벨 기준).
 검색 범위: test 데이터셋 내부에서만 (train 미사용)
 
-→ 업로드할 학습 모델 없음. 검색은 공개 CLIP, 라벨은 제공된 CSV 사용.
+→ 업로드할 학습 모델 없음. 검색은 공개 CLIP, 라벨 표기는 제공된 CSV.
 (참고: task1.pt 는 Task1 전용이며 Task3 에서는 사용하지 않음)
