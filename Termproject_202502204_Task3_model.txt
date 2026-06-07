@@ -5,7 +5,7 @@ Task 3 — Image Retrieval (Embedding Similarity Search) model
 파일: task1.pt (Task1과 동일 파일 재사용 — 특징 추출용)
 
 Google Drive 공유 링크 (링크가 있는 모든 사용자 공개):
-task1.pt : https://drive.google.com/file/d/12bq6yp7NkHreXwQZz6zH73bNrwu5zZSG/view?usp=drive_link
+task1.pt : https://drive.google.com/file/d/1roBI4OaoCKlVJQDUGRKFsbB0_wSgRSrH/view?usp=drive_link
 
 파일 ID (노트북 MODEL_FILE_ID):
-12bq6yp7NkHreXwQZz6zH73bNrwu5zZSG
+1roBI4OaoCKlVJQDUGRKFsbB0_wSgRSrH

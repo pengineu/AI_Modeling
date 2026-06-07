@@ -5,7 +5,7 @@ Task 2 — Image Generation (Style Transfer) model
 생성 범위: test 데이터 앞 20장(0.jpg~19.jpg), 원본 제외 2개 스타일씩 = 40장
 
 Google Drive 공유 링크 (링크가 있는 모든 사용자 공개):
-stargan_G.pt : https://drive.google.com/file/d/1JwGHAERJjLWBR5JA2JbC_TmYkd0NqaSd/view?usp=drive_link
+stargan_G.pt : https://drive.google.com/file/d/1Xx1HGiQz2OFMI53OaiCXbxyBcyiX2dT4/view?usp=drive_link
 
 파일 ID (노트북 STARGAN_FILE_ID):
-1JwGHAERJjLWBR5JA2JbC_TmYkd0NqaSd
+1Xx1HGiQz2OFMI53OaiCXbxyBcyiX2dT4
