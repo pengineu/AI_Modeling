@@ -1,0 +1,9 @@
+Task 1 — Image Classification model
+모델: EfficientNet-B0 (ImageNet 사전학습) + 2-head (fruit 6 / style 3)
+파일: task1.pt   (검증: val style 1.0000 / fruit 0.9993)
+
+Google Drive 공유 링크 (링크가 있는 모든 사용자 공개):
+https://drive.google.com/file/d/1roBI4OaoCKlVJQDUGRKFsbB0_wSgRSrH/view?usp=drive_link
+
+파일 ID (노트북 MODEL_FILE_ID):
+1roBI4OaoCKlVJQDUGRKFsbB0_wSgRSrH
